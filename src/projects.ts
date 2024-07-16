@@ -44,15 +44,20 @@ export class MyProjectsProvider implements vscode.TreeDataProvider<Project> {
     }
 
     getChildren(element?: Project): Thenable<Project[]> {
-        if (element?.label === 'folder1') {
-            return Promise.resolve(this.findProjects(vscode.Uri.file("/Users/jdukes/Developer/CSU1102x/solution"), 1));
-        } else if (element) {
-            return Promise.resolve([]);
-        } else {
+        if (element === undefined) {
+            // Populate project root nodes
             return Promise.resolve([
-                new Project('folder1', '', vscode.TreeItemCollapsibleState.Collapsed),
-                new Project('folder2', '', vscode.TreeItemCollapsibleState.Collapsed)
+                // Just some dummy values for testing
+                // TODO: Replace with project roots from configuration
+                new Project('solution', vscode.Uri.file("/Users/jdukes/Developer/CSU1102x/solution"), true, vscode.TreeItemCollapsibleState.Collapsed),
+                new Project('provided', vscode.Uri.file("/Users/jdukes/Developer/CSU1102x/provided"), true, vscode.TreeItemCollapsibleState.Collapsed)
             ]);
+        } else if (element.isProjectRoot) {
+            // Search for projects under this project root and populate children
+            return Promise.resolve(this.findProjects(element?.uri, 1));
+        } else {
+            // A leaf node - no children
+            return Promise.resolve([]);
         }
     }
 
@@ -62,11 +67,12 @@ export class MyProjectsProvider implements vscode.TreeDataProvider<Project> {
             let projects: Project[] = [];
             for (const [name, type] of files) {
                 if (type === vscode.FileType.Directory) {
-                    if (await this.isProjectDirectory(vscode.Uri.joinPath(uri, name)) === true) {
-                        projects.push(new Project(name, uri.fsPath, vscode.TreeItemCollapsibleState.None));
+                    const projectPath = vscode.Uri.joinPath(uri, name);
+                    if (await this.isProjectDirectory(projectPath) === true) {
+                        projects.push(new Project(name, projectPath, false, vscode.TreeItemCollapsibleState.None));
                     }
                     if (maxDepth > 1) {
-                        projects = projects.concat(await this.findProjects(vscode.Uri.joinPath(uri, name), maxDepth - 1));
+                        projects = projects.concat(await this.findProjects(projectPath, maxDepth - 1));
                     }
                 }
             }
@@ -90,12 +96,13 @@ export class MyProjectsProvider implements vscode.TreeDataProvider<Project> {
 class Project extends vscode.TreeItem {
     constructor(
         public readonly label: string,
-        private uri: string = '',
+        public readonly uri: vscode.Uri,
+        public readonly isProjectRoot: boolean,
         public readonly collapsibleState: vscode.TreeItemCollapsibleState
     ) {
         super(label, collapsibleState);
-        this.tooltip = `${this.uri}`;
-        this.contextValue = 'Project';
+        this.tooltip = `${this.uri.fsPath}`;
+        this.contextValue = isProjectRoot ? 'ProjectRoot' : 'Project';
     }
 
     iconPath = {
