@@ -54,41 +54,67 @@ export class MyProjectsProvider implements vscode.TreeDataProvider<Project> {
             ]);
         } else if (element.isProjectRoot) {
             // Search for projects under this project root and populate children
-            return Promise.resolve(this.findProjects(element?.uri, 1));
+            return this.findProjects(element?.uri, 1).then((projects) => {
+                return Promise.resolve(projects);
+            });
         } else {
             // A leaf node - no children
             return Promise.resolve([]);
         }
     }
 
-    private async findProjects(uri: vscode.Uri, maxDepth: number = 1): Promise<Project[]> {
+    // private async findProjects(uri: vscode.Uri, maxDepth: number = 0): Promise<Project[]> {
 
-        return vscode.workspace.fs.readDirectory(uri).then(async (files) => {
+    //     const files = await vscode.workspace.fs.readDirectory(uri);
+    //     let projects: Project[] = [];
+    //     for (const [name, type] of files) {
+    //         if (type === vscode.FileType.Directory) {
+    //             const projectPath = vscode.Uri.joinPath(uri, name);
+    //             if (await this.isProjectDirectory(projectPath) === true) {
+    //                 projects.push(new Project(name, projectPath, false, vscode.TreeItemCollapsibleState.None));
+    //             }
+    //             if (maxDepth > 0) {
+    //                 projects = projects.concat(await this.findProjects(projectPath, maxDepth - 1));
+    //             }
+    //         }
+    //     }
+    //     return projects;
+    // }
+
+    private async findProjects(uri: vscode.Uri, maxDepth: number = 0): Promise<Project[]> {
+
+        return vscode.workspace.fs.readDirectory(uri).then((files) => {
             let projects: Project[] = [];
+            let promises: Promise<any>[] = [];
             for (const [name, type] of files) {
                 if (type === vscode.FileType.Directory) {
                     const projectPath = vscode.Uri.joinPath(uri, name);
-                    if (await this.isProjectDirectory(projectPath) === true) {
-                        projects.push(new Project(name, projectPath, false, vscode.TreeItemCollapsibleState.None));
-                    }
-                    if (maxDepth > 1) {
-                        projects = projects.concat(await this.findProjects(projectPath, maxDepth - 1));
+                    promises.push(this.isProjectDirectory(projectPath).then((isProject) => {
+                        if (isProject === true) {
+                            projects.push(new Project(name, projectPath, false, vscode.TreeItemCollapsibleState.None));
+                        }
+                    }));
+                    if (maxDepth > 0) {
+                        promises.push(this.findProjects(projectPath, maxDepth - 1).then((subprojects) => {
+                            projects.concat(subprojects);
+                        }));
                     }
                 }
             }
-            return Promise.resolve(projects);
+            return Promise.all(promises).then(() => {
+                return projects;
+            });
         });
-
-    }
+    }    
 
     private async isProjectDirectory(uri: vscode.Uri): Promise<boolean> {
         return vscode.workspace.fs.readDirectory(uri).then((files) => {
             for (const [name, type] of files) {
                 if (type === vscode.FileType.File && name.endsWith('.code-workspace')) {
-                    return Promise.resolve(true);
+                    return true;
                 }
             }
-            return Promise.resolve(false);
+            return false;
         });
     }
 }
