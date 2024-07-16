@@ -1,8 +1,8 @@
 // The module 'vscode' contains the VS Code extensibility API
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
-import { AvailableRepositoriesProvider, AvailableRepository } from './repositories';
-import { ClonedRepositoriesProvider } from './repositories';
+import { MyProjectsProvider } from './projects';
+import { AvailableProjectsProvider, AvailableProject } from './projects';
 
 // This method is called when your extension is activated
 // Your extension is activated the very first time the command is executed
@@ -12,14 +12,14 @@ export function activate(context: vscode.ExtensionContext) {
 	// This line of code will only be executed once when your extension is activated
 	console.log('Congratulations, your extension "tcd-coder" is now active!');
 	
-	const clonedRepositoriesProvider = new ClonedRepositoriesProvider();
-	vscode.window.registerTreeDataProvider('clonedRepositories', clonedRepositoriesProvider);
+	const myProjectsProvider = new MyProjectsProvider();
+	vscode.window.registerTreeDataProvider('myProjects', myProjectsProvider);
 
-	const availableRepositoriesProvider = new AvailableRepositoriesProvider();
-	vscode.window.registerTreeDataProvider('availableRepositories', availableRepositoriesProvider);
+	const availableProjectsProvider = new AvailableProjectsProvider();
+	vscode.window.registerTreeDataProvider('availableProjects', availableProjectsProvider);
 
-	vscode.commands.registerCommand('availableRepositories.clone', () => 
-		vscode.window.showInformationMessage('Will clone the repository')
+	vscode.commands.registerCommand('availableProjects.getProject', () => 
+		vscode.window.showInformationMessage('Will get the project')
 	);
 }
 

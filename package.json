@@ -14,55 +14,46 @@
   "contributes": {
     "commands": [
       {
-        "command": "availableRepositories.clone",
-        "title": "Clone Repository",
+        "command": "availableProjects.getProject",
+        "title": "Get Project",
         "icon": {
           "light": "resources/light/repo-clone.svg",
           "dark": "resources/dark/repo-clone.svg"
         },
-        "when": "view == availableRepositories && viewItem == availableRepository"
+        "when": "view == availableProjects && viewItem == availableProject"
       }
     ],    
     "menus": {
       "view/item/context": [
         {
-          "command": "availableRepositories.clone",
-          "when": "view == availableRepositories && viewItem == availableRepository",
+          "command": "availableProjects.getProject",
+          "when": "view == availableProjects && viewItem == availableProject",
           "group": "inline"
         }
       ]
     },
-    "viewsContainers": {
-      "activitybar": [
-        {
-          "id": "repository-directory",
-          "title": "Repository Directory",
-          "icon": "resources/dep.svg"
-        }
-      ]
-    },
     "views": {
-      "repository-directory": [
+      "explorer": [
         {
-          "id": "clonedRepositories",
-          "name": "Cloned Repositories",
+          "id": "myProjects",
+          "name": "My Projects",
           "icon": "resources/dep.svg",
-          "contextualTitle": "Repository Directory",
-          "type": "tree"
+          "type": "tree",
+          "order": 1
         },
         {
-          "id": "availableRepositories",
-          "name": "Available Repositories",
+          "id": "availableProjects",
+          "name": "Available Projects",
           "icon": "resources/dep.svg",
-          "contextualTitle": "Repository Directory",
-          "type": "tree"
+          "type": "tree",
+          "order": 2
         }
       ]
     },
     "viewsWelcome": [
       {
-        "view": "availableRepositories",
-        "contents": "No repos available"
+        "view": "availableProjects",
+        "contents": "No project sources available. Add a project source."
       }
     ]
   },
