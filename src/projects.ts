@@ -54,8 +54,8 @@ export class MyProjectsProvider implements vscode.TreeDataProvider<Project> {
             ]);
         } else if (element.isProjectRoot) {
             // Search for projects under this project root and populate children
-            return this.findProjects(element?.uri, 1).then((projects) => {
-                return Promise.resolve(projects);
+            return this.findProjects(element?.uri, 2).then((projects) => {
+                return Promise.resolve(projects.sort((a, b) => a.label.localeCompare(b.label)));
             });
         } else {
             // A leaf node - no children
@@ -96,7 +96,7 @@ export class MyProjectsProvider implements vscode.TreeDataProvider<Project> {
                     }));
                     if (maxDepth > 0) {
                         promises.push(this.findProjects(projectPath, maxDepth - 1).then((subprojects) => {
-                            projects.concat(subprojects);
+                            projects.push(...subprojects);
                         }));
                     }
                 }
