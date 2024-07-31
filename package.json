@@ -38,30 +38,6 @@
         }
       ]
     },
-    "views": {
-      "explorer": [
-        {
-          "id": "myProjects",
-          "name": "My Projects",
-          "icon": "resources/dep.svg",
-          "type": "tree",
-          "order": 1
-        },
-        {
-          "id": "availableProjects",
-          "name": "Available Projects",
-          "icon": "resources/dep.svg",
-          "type": "tree",
-          "order": 2
-        }
-      ]
-    },
-    "viewsWelcome": [
-      {
-        "view": "availableProjects",
-        "contents": "No project sources available. Add a project source."
-      }
-    ],
     "configuration": {
       "title": "TCD Coder",
       "properties": {

@@ -24,15 +24,15 @@ export function activate(context: vscode.ExtensionContext) {
 	let disposable = vscode.commands.registerCommand('tcd-coder.applyConfig', applyConfig);
 	context.subscriptions.push(disposable);
 	
-	const myProjectsProvider = new MyProjectsProvider();
-	vscode.window.registerTreeDataProvider('myProjects', myProjectsProvider);
+	// const myProjectsProvider = new MyProjectsProvider();
+	// vscode.window.registerTreeDataProvider('myProjects', myProjectsProvider);
 
-	const availableProjectsProvider = new AvailableProjectsProvider();
-	vscode.window.registerTreeDataProvider('availableProjects', availableProjectsProvider);
+	// const availableProjectsProvider = new AvailableProjectsProvider();
+	// vscode.window.registerTreeDataProvider('availableProjects', availableProjectsProvider);
 
-	vscode.commands.registerCommand('availableProjects.getProject', () => 
-		vscode.window.showInformationMessage('Will get the project')
-	);
+	// vscode.commands.registerCommand('availableProjects.getProject', () => 
+	// 	vscode.window.showInformationMessage('Will get the project')
+	// );
 }
 
 // This method is called when your extension is deactivated

@@ -1,71 +1,42 @@
-# tcd-coder README
+# TCD Coder extension for Visual Studio Code
 
-This is the README for your extension "tcd-coder". After writing up a brief description, we recommend including the following sections.
+This small Visual Studio Code extension is intended for students taking modules in the [School of Computer Science and Statistics](https://www.scss.tcd.ie) at [Trinity College Dublin](https://www.tcd.ie).
+
+The extension provides module-specific configuration settings for Visual Studio Code that are then used by other extensions (e.g. Cortex-Debug), tasks and launch configurations. The settings simplify cross-platform support.
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+### Manually choose a module and environment and apply settings
+The `Apply Settings ...` command allows you to choose a module and an environment profile and then sets appropriate Visual Studio Code settings to support the chosen module.
 
-For example if there is an image subfolder under your extension project workspace:
+### Auto-detect environment and module and apply settings
+On startup, the extension will also attempt to auto-detect the environment and apply an appropriate settings profile.
 
-\!\[feature X\]\(images/feature-x.png\)
+### Detect and warn about UNC paths
+Since network UNC paths are not supported by the toolchain used in the module, the extension will attempt to detect when a folder or workspace is incorrectly opened using a TCD School of Computer Science and Statistics UNC path and, if possible, will prompt the user to re-open the folder/workspace using a mapped drive.
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
+## Use
 
-## Requirements
+### Manual application of settings
 
-If you have any requirements or dependencies, add a section describing those and how to install and configure them.
+Use the `Apply Settings ...` command to chose a module and environment.
 
-## Extension Settings
+### Automatic delection of environment and application of module settings 
 
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
+To support automatic detection of encironments and automatic application of module settings, the extension is activated when a folder is opened that contains a `tcd-coder.json` file. In a multi-root workspace, this can be in the root of any of the folders included in the workspace.
 
-For example:
+Only one `key:value` pair is currently supported in the `tcd-coder.json` file. The `module` key identifies the module for which settings should be applied. The module identifier MUST correspond to one of the modules supported by the extension, for example:
 
-This extension contributes the following settings:
+```JSON
+{
+    "module": "CSU11021"
+}
+```
 
-* `myExtension.enable`: Enable/disable this extension.
-* `myExtension.thing`: Set to `blah` to do something.
+## Planned Features
+
+ - List repositories available in a configured GitLab group and provide a simple means to clone a selected project and add it to the current multi-root workspace.
 
 ## Known Issues
 
-Calling out known issues can help limit users opening duplicate issues against your extension.
-
-## Release Notes
-
-Users appreciate release notes as you update your extension.
-
-### 1.0.0
-
-Initial release of ...
-
-### 1.0.1
-
-Fixed issue #.
-
-### 1.1.0
-
-Added features X, Y, and Z.
-
----
-
-## Following extension guidelines
-
-Ensure that you've read through the extensions guidelines and follow the best practices for creating your extension.
-
-* [Extension Guidelines](https://code.visualstudio.com/api/references/extension-guidelines)
-
-## Working with Markdown
-
-You can author your README using Visual Studio Code. Here are some useful editor keyboard shortcuts:
-
-* Split the editor (`Cmd+\` on macOS or `Ctrl+\` on Windows and Linux).
-* Toggle preview (`Shift+Cmd+V` on macOS or `Shift+Ctrl+V` on Windows and Linux).
-* Press `Ctrl+Space` (Windows, Linux, macOS) to see a list of Markdown snippets.
-
-## For more information
-
-* [Visual Studio Code's Markdown Support](http://code.visualstudio.com/docs/languages/markdown)
-* [Markdown Syntax Reference](https://help.github.com/articles/markdown-basics/)
-
-**Enjoy!**
+No known issues
