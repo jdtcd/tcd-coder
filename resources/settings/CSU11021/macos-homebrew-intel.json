@@ -1,0 +1,10 @@
+{
+    "name": "MacOS with Homebrew on your own (older) Intel Mac (ADVANCED)",
+    "ordinal": 75,
+    "moduleConfiguration": {
+        "armToolchainPath": "/usr/local/bin",
+        "gdbPath": "/usr/local/bin/arm-none-eabi-gdb",
+        "qemuPath": "/usr/local/bin/qemu-system-arm",
+        "openocdPath": "/usr/local/bin/openocd"
+    }
+}

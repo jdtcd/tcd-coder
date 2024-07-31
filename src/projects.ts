@@ -33,8 +33,8 @@ export class AvailableProject extends vscode.TreeItem {
     }
 
     iconPath = {
-        light: path.join(__filename, '..', '..', 'resources', 'light', 'folder.svg'),
-        dark: path.join(__filename, '..', '..', 'resources', 'dark', 'folder.svg')
+        light: path.join(__filename, '..', '..', 'resources', 'icons', 'light', 'folder.svg'),
+        dark: path.join(__filename, '..', '..', 'resources', 'icons', 'dark', 'folder.svg')
     };
 }
 
@@ -132,7 +132,7 @@ class Project extends vscode.TreeItem {
     }
 
     iconPath = {
-        light: path.join(__filename, '..', '..', 'resources', 'light', 'folder-active.svg'),
-        dark: path.join(__filename, '..', '..', 'resources', 'dark', 'folder-active.svg')
+        light: path.join(__filename, '..', '..', 'resources', 'icons', 'light', 'folder-active.svg'),
+        dark: path.join(__filename, '..', '..', 'resources', 'icons', 'dark', 'folder-active.svg')
     };
 }

@@ -14,11 +14,15 @@
   "contributes": {
     "commands": [
       {
+        "command": "tcd-coder.applyConfig",
+        "title": "TCD Coder: Apply settings for a module"
+      },
+      {
         "command": "availableProjects.getProject",
         "title": "Get Project",
         "icon": {
-          "light": "resources/light/repo-clone.svg",
-          "dark": "resources/dark/repo-clone.svg"
+          "light": "resources/icons/light/repo-clone.svg",
+          "dark": "resources/icons/dark/repo-clone.svg"
         },
         "when": "view == availableProjects && viewItem == availableProject"
       }
@@ -55,7 +59,51 @@
         "view": "availableProjects",
         "contents": "No project sources available. Add a project source."
       }
-    ]
+    ],
+    "configuration": {
+      "title": "TCD Coder",
+      "properties": {
+        "tcd-coder.modules.CSU11021": {
+          "type": "object",
+          "title": "CSU11021 Introduction to Computing",
+          "additionalProperties": false,
+          "ignoreSync": true,
+          "scope": "machine",
+          "properties": {
+            "armToolchainPath": {
+              "title": "Arm GNU Toolchain Path",
+              "type": "string",
+              "order": 1,
+              "description": "Path to the directory/folder containing Arm GNU Toolchain executables (usually ending in /bin)"
+            },
+            "gdbPath": {
+              "title": "GDB Path",
+              "type": "string",
+              "order": 2,
+              "description": "Full path to the GDB executable (usually arm-none-eabi-gdb, arm-none-eabi-gdb.exe or gdm-multiarch)"
+            },
+            "qemuPath": {
+              "title": "QEMU Path",
+              "type": "string",
+              "order": 3,
+              "description": "Full path to the QEMU emulator executable (usually ending in qemu-system-arm.exe or qemu-system-arm)"
+            },
+            "openocdPath": {
+              "title": "OpenOCD Path",
+              "type": "string",
+              "order": 4,
+              "description": "Full path to the OpenOCD executable (usually ending in openocd.exe or openocd)"
+            }
+          },
+          "default": {
+            "armToolchainPath": "/usr/bin",
+            "gdbPath": "/usr/bin/gdb-multiarch",
+            "qemuPath": "/usr/bin/qemu-system-arm",
+            "openocdPath": "/usr/bin/openocd"
+          }
+        }
+      }
+    }
   },
   "scripts": {
     "vscode:prepublish": "npm run compile",

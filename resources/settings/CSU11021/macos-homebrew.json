@@ -1,0 +1,10 @@
+{
+    "name": "MacOS with Homebrew on your own Apple Silicon Mac (ADVANCED)",
+    "ordinal": 50,
+    "moduleConfiguration": {
+        "armToolchainPath": "/opt/homebrew/bin",
+        "gdbPath": "/opt/homebrew/bin/arm-none-eabi-gdb",
+        "qemuPath": "/opt/homebrew/bin/qemu-system-arm",
+        "openocdPath": "/opt/homebrew/bin/openocd"
+    }
+}

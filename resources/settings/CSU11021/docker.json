@@ -1,0 +1,10 @@
+{
+    "name": "Docker Desktop on your own Computer (Windows, MacOS or Linux)",
+    "ordinal": 25,
+    "moduleConfiguration": {
+        "armToolchainPath": "/usr/bin",
+        "gdbPath": "/usr/bin/gdb-multiarch",
+        "qemuPath": "/usr/bin/qemu-system-arm",
+        "openocdPath": "/usr/bin/openocd"
+    }
+}
