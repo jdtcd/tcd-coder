@@ -46,19 +46,25 @@ export async function applyConfig() {
 
 export async function detectAndApplyConfig() {
 
-	// Open the file tcd-coder.json in the .tcd-coder directory relative to the workspace file
-	const workspaceFile = vscode.workspace.workspaceFile?.fsPath;
-	if (workspaceFile === undefined) {
-		console.log('No workspace file found');
+	const workspaceFolders = vscode.workspace.workspaceFolders;
+
+	if (workspaceFolders === undefined) {
 		return;
 	}
 
-	// Build the path to .tcd-coder/tcd-coder.json
-	const settingsFile = path.join(path.dirname(workspaceFile), '.tcd-coder', 'tcd-coder.json');
-	if (!fs.existsSync(settingsFile)) {
-		console.log('TCD Coder settings not found: ' + settingsFile);
-		return;
+	let settingsFile = '';
+	for (let i = 0; i < workspaceFolders.length; i++) {
+		// Build the path to tcd-coder.json
+		const testFile = path.join(workspaceFolders[i].uri.fsPath, 'tcd-coder.json');
+		if (!fs.existsSync(testFile)) {
+			continue;
+		} else {
+			settingsFile = testFile;
+			break;
+		}
 	}
+
+	console.log('Using TCD Coder settings file: ' + settingsFile);
 
 	// Read the TCD coder settings file
 	const rawJson = fs.readFileSync(settingsFile, 'utf8');
