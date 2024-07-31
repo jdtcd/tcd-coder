@@ -49,8 +49,8 @@ export class MyProjectsProvider implements vscode.TreeDataProvider<Project> {
             return Promise.resolve([
                 // Just some dummy values for testing
                 // TODO: Replace with project roots from configuration
-                new Project('solution', vscode.Uri.file("/Users/jdukes/Developer/CSU1102x/solution"), true, vscode.TreeItemCollapsibleState.Collapsed),
-                new Project('provided', vscode.Uri.file("/Users/jdukes/Developer/CSU1102x/provided"), true, vscode.TreeItemCollapsibleState.Collapsed)
+                // new Project('solution', vscode.Uri.file("/Users/jdukes/Developer/CSU1102x/solution"), true, vscode.TreeItemCollapsibleState.Collapsed),
+                // new Project('provided', vscode.Uri.file("/Users/jdukes/Developer/CSU1102x/provided"), true, vscode.TreeItemCollapsibleState.Collapsed)
             ]);
         } else if (element.isProjectRoot) {
             // Search for projects under this project root and populate children
@@ -110,7 +110,7 @@ export class MyProjectsProvider implements vscode.TreeDataProvider<Project> {
     private async isProjectDirectory(uri: vscode.Uri): Promise<boolean> {
         return vscode.workspace.fs.readDirectory(uri).then((files) => {
             for (const [name, type] of files) {
-                if (type === vscode.FileType.File && name.endsWith('.code-workspace')) {
+                if (type === vscode.FileType.Directory && name === '.vscode') {
                     return true;
                 }
             }

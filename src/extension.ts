@@ -2,7 +2,7 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from 'vscode';
 import { checkWinUncFolder } from './utils';
-import { applyConfig } from './settings';
+import { applyConfig, detectAndApplyConfig } from './settings';
 import { MyProjectsProvider } from './projects';
 import { AvailableProjectsProvider, AvailableProject } from './projects';
 
@@ -16,6 +16,9 @@ export function activate(context: vscode.ExtensionContext) {
 
 	// Check for bad Windows UNC paths (which are unsupported)
 	checkWinUncFolder();
+
+	// Detect platform and apply configuration
+	detectAndApplyConfig();
 
 	// Register commands
 	let disposable = vscode.commands.registerCommand('tcd-coder.applyConfig', applyConfig);

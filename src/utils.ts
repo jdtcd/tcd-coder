@@ -16,12 +16,14 @@ export function checkWinUncFolder() {
 		return;
 	}
 
+	console.log("Checking for problematic UNC path on Windows platforms ...");
+
 	const folder = vscode.workspace.workspaceFolders[0];
 	console.log("Checking folder: " + folder.uri.fsPath);
 
 	const regex = new RegExp("^\\\\\\\\tholosug\\.(?:itserv\\.)?scss\\.tcd\\.ie\\\\ugrad\\\\[a-zA-Z0-9_]+\\\\", "i");
 	if (regex.test(folder.uri.fsPath)) {
-		console.log("UNC path detected.");
+		console.log("UNC path detected");
 		const fixPath = folder.uri.fsPath.replace(regex, 'U:\\');
 		let fixAvailable = false;
 		try {
@@ -54,6 +56,6 @@ export function checkWinUncFolder() {
 		}
 	}
 	else {
-		console.log("Not a UNC path.");
+		console.log("Not a UNC path");
 	}
 }

@@ -1,0 +1,19 @@
+{
+    "auto": [
+        {
+            "envKey": "TCD_CODER_PLATFORM_ID",
+            "envValue": "CODER",
+            "settings": "docker.json"
+        },
+        {
+            "envKey": "TCD_CODER_PLATFORM_ID",
+            "envValue": "DOCKER",
+            "settings": "docker.json"
+        },
+        {
+            "envKey": "USERDNSDOMAIN",
+            "envValue": "ITSERV.SCSS.TCD.IE",
+            "settings": "windows-scsslab.json"
+        }
+    ]
+}

@@ -2,15 +2,104 @@ import * as vscode from 'vscode';
 import * as fs from 'fs';
 import path = require('path');
 
-interface IHelperConfig {
+const MODULE_CONFIG_PATH = path.join(__dirname, '..', 'resources', 'settings');
+
+interface IModuleConfig {
 	name: string;
 	ordinal?: number;
-	moduleConfiguration: object;
+	moduleSettings: object;
 }
 
+interface IModuleSettings {
+	auto: [
+		{
+			envKey: string;
+			envValue: string;
+			settings: string;
+		}
+	]
+}
 
-async function quickPickModule(settingsPath: string): Promise<string | undefined> {
-    const settignsDirEnts = fs.readdirSync(settingsPath, { withFileTypes: true });
+// Implementation of command 'Apply Configuration'
+// Applies configurations settings from a JSON object
+//   to VSCode user settings.
+export async function applyConfig() {
+
+    // Retrieve available modules and ask user to select one
+    const moduleId = await quickPickModule();
+
+	if (moduleId === undefined) {
+		return;
+	}
+
+	// Retrieve available configurations and ask user to select one
+	const moduleConfig = await quickPickConfig(moduleId);
+
+	if (moduleConfig === undefined) {
+		return;
+	}
+
+	console.log("Selected " + moduleConfig + " for module " + moduleId);
+
+	applyModuleConfigFile(moduleId, moduleConfig);
+}
+
+export async function detectAndApplyConfig() {
+
+	// Open the file tcd-coder.json in the .tcd-coder directory relative to the workspace file
+	const workspaceFile = vscode.workspace.workspaceFile?.fsPath;
+	if (workspaceFile === undefined) {
+		console.log('No workspace file found');
+		return;
+	}
+
+	// Build the path to .tcd-coder/tcd-coder.json
+	const settingsFile = path.join(path.dirname(workspaceFile), '.tcd-coder', 'tcd-coder.json');
+	if (!fs.existsSync(settingsFile)) {
+		console.log('TCD Coder settings not found: ' + settingsFile);
+		return;
+	}
+
+	// Read the TCD coder settings file
+	const rawJson = fs.readFileSync(settingsFile, 'utf8');
+	const config = JSON.parse(rawJson);
+	if (config === undefined || config.module === undefined) {
+		console.log('Error parsing TCD Coder settings file');
+		return;
+	}
+	const moduleId = config.module;
+	const moduleSettingsFile = path.join(MODULE_CONFIG_PATH, moduleId, "settings.json");
+
+	if (!fs.existsSync(moduleSettingsFile)) {
+		console.log('No settings file found for module ' + moduleId + ' (' + moduleSettingsFile + ')');
+		return;
+	}
+
+	// Read the JSON configuration file
+	const autoChecks = [];
+	try {
+		const rawJson = fs.readFileSync(path.join(MODULE_CONFIG_PATH, moduleId, "settings.json"), 'utf8');
+		const config = JSON.parse(rawJson) as IModuleSettings;	
+		autoChecks.push(...config.auto);	
+	}
+	catch (err) {
+		console.log("Error parsing settings file (" + settingsFile + ") for module " + moduleId);
+		return;
+	}
+
+	for (let i = 0; i < autoChecks.length; i++) {
+		const check = autoChecks[i];
+		const envValue = process.env[check.envKey];
+		if (envValue === check.envValue) {
+			console.log('Auto-configuring: ' + check.settings + ' for ' + moduleId);
+			await applyModuleConfigFile(moduleId, check.settings);
+			break;
+		}
+	}
+}
+
+async function quickPickModule(): Promise<string | undefined> {
+    const settignsDirEnts = fs.readdirSync(MODULE_CONFIG_PATH, { withFileTypes: true });
     const moduleNames = settignsDirEnts.filter((ent) => ent.isDirectory()).map((ent) => ent.name);
 
     if (moduleNames.length === 0) {
@@ -32,35 +121,31 @@ async function quickPickModule(settingsPath: string): Promise<string | undefined
 }
 
 
-async function quickPickConfig(settingsPath: string): Promise<(IHelperConfig | undefined)> {
+async function quickPickConfig(moduleId: string): Promise<(string | undefined)> {
 
 	class QuickPickModuleConfig implements vscode.QuickPickItem {
 		label: string;
 		description: string;
-		spec: IHelperConfig;
+		configFile: string;
 		ordinal: number = 99;
-		constructor(filename: string, config: IHelperConfig) {
+		constructor(filename: string, config: IModuleConfig) {
 			this.label = config.name;
 			this.description = filename;
-			this.spec = config;
+			this.configFile = filename;
 			this.ordinal = config.ordinal || 99;
 		}
 	}
 
-	const settingsFiles = fs.readdirSync(settingsPath);
+	const configFiles = fs.readdirSync(path.join(MODULE_CONFIG_PATH, moduleId));
 
 	const qpItems = [];
-	for (const file of settingsFiles) {
-		console.log("Found: " + file);
-		const configPath = path.join(settingsPath, file);
-		try {
-			const rawJson = fs.readFileSync(configPath, 'utf8');
-			const config = JSON.parse(rawJson);	
-			qpItems.push(new QuickPickModuleConfig(file, config));
-		} catch (err) {
-			console.log("Error parsing file: " + file);
-			console.log(err);
+	for (const configFile of configFiles) {
+		console.log("Found: " + configFile);
+		const config = readConfig(moduleId, configFile);
+		if (config === undefined) {
+			continue;
 		}
+		qpItems.push(new QuickPickModuleConfig(configFile, config));
 	}
 
 	if (qpItems.length === 0) {
@@ -76,41 +161,35 @@ async function quickPickConfig(settingsPath: string): Promise<(IHelperConfig | u
 		canPickMany: false
 	});
 
-	return pick?.spec as IHelperConfig;
+	return pick?.configFile;
 }
 
+async function applyModuleConfigFile(moduleId: string, configFile: string) {
 
-// Implementation of command 'Apply Configuration'
-// Applies configurations settings from a JSON object
-//   to VSCode user settings.
-export async function applyConfig() {
+	const configuration = readConfig(moduleId, configFile);
 
-    const settingsPath = path.join(__dirname, '..', 'resources', 'settings');
-
-    // Retrieve available modules and ask user to select one
-    const pickModuleId = await quickPickModule(settingsPath);
-
-	if (pickModuleId === undefined) {
+	if (configuration === undefined || configuration.moduleSettings === undefined) {
 		return;
 	}
 
-    const modulePath = path.join(settingsPath, pickModuleId);
-
-	// Retrieve available configurations and ask user to select one
-	const pickConf = await quickPickConfig(modulePath);
-
-	if (pickConf === undefined) {
-		return;
-	}
-
-	console.log("Selected: " + pickConf.name);
-
-	const pickModuleConf = vscode.workspace.getConfiguration('tcd-coder.modules');
+	const moduleConfigs = vscode.workspace.getConfiguration('tcd-coder.modules');
 
     try {
-        await pickModuleConf.update(pickModuleId, pickConf.moduleConfiguration, vscode.ConfigurationTarget.Global);
+        await moduleConfigs.update(moduleId, configuration.moduleSettings, vscode.ConfigurationTarget.Global);
     }
     catch (err) {
-        vscode.window.showErrorMessage("Error updating settings for " + pickModuleId);
+        vscode.window.showErrorMessage("Error updating settings for " + moduleId);
     }
+}
+
+function readConfig(moduleId: string, configFile: string): IModuleConfig | undefined {
+	try {
+		const rawJson = fs.readFileSync(path.join(MODULE_CONFIG_PATH, moduleId, configFile), 'utf8');
+		return JSON.parse(rawJson) as IModuleConfig;
+	}
+	catch (err) {
+		console.log("Error parsing file: " + configFile);
+		console.log(err);		
+		return undefined;
+	}
 }
