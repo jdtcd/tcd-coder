@@ -44,7 +44,7 @@ export async function applyConfig() {
 	applyModuleConfigFile(moduleId, moduleConfig);
 }
 
-export async function detectAndApplyConfig() {
+export async function findAndApplyConfigs() {
 
 	const workspaceFolders = vscode.workspace.workspaceFolders;
 
@@ -52,28 +52,36 @@ export async function detectAndApplyConfig() {
 		return;
 	}
 
-	let settingsFile = '';
+	const moduleIds = new Set<string>();
+
 	for (let i = 0; i < workspaceFolders.length; i++) {
 		// Build the path to tcd-coder.json
-		const testFile = path.join(workspaceFolders[i].uri.fsPath, 'tcd-coder.json');
-		if (!fs.existsSync(testFile)) {
+		const tcdCoderFile = path.join(workspaceFolders[i].uri.fsPath, '.tcd-coder.json');
+		if (!fs.existsSync(tcdCoderFile)) {
 			continue;
-		} else {
-			settingsFile = testFile;
-			break;
+		}
+		
+		// Read the .tcd-coder.json file
+		try {
+			const rawJson = fs.readFileSync(tcdCoderFile, 'utf8');
+			const config = JSON.parse(rawJson);	
+			moduleIds.add(config.module);
+		}
+		catch (err) {
+			console.log('Error parsing TCD Coder settings file');
+			return;
 		}
 	}
 
-	console.log('Using TCD Coder settings file: ' + settingsFile);
-
-	// Read the TCD coder settings file
-	const rawJson = fs.readFileSync(settingsFile, 'utf8');
-	const config = JSON.parse(rawJson);
-	if (config === undefined || config.module === undefined) {
-		console.log('Error parsing TCD Coder settings file');
-		return;
+	for (const moduleId of moduleIds) {
+		detectAndConfig(moduleId);
 	}
-	const moduleId = config.module;
+}
+
+async function detectAndConfig(moduleId: string) {
+	
+	console.log('Applying config for module: ' + moduleId);
+
 	const moduleSettingsFile = path.join(MODULE_CONFIG_PATH, moduleId, "settings.json");
 
 	if (!fs.existsSync(moduleSettingsFile)) {
@@ -89,7 +97,7 @@ export async function detectAndApplyConfig() {
 		autoChecks.push(...config.auto);	
 	}
 	catch (err) {
-		console.log("Error parsing settings file (" + settingsFile + ") for module " + moduleId);
+		console.log("Error parsing settings.json file for module " + moduleId);
 		return;
 	}
 
@@ -97,7 +105,7 @@ export async function detectAndApplyConfig() {
 		const check = autoChecks[i];
 		const envValue = process.env[check.envKey];
 		if (envValue === check.envValue) {
-			console.log('Auto-configuring: ' + check.settings + ' for ' + moduleId);
+			console.log('Auto configuring: ' + check.settings + ' for ' + moduleId);
 			await applyModuleConfigFile(moduleId, check.settings);
 			break;
 		}

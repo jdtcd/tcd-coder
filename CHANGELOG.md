@@ -1,5 +1,13 @@
 # Change Log
 
+## [0.0.2] - 2024-08-02
+
+### Changed
+
+- Look in all workspace root folders for `.tcd-coder.json` and attempt to
+  automatically detect and apply settings for each distinct module found.
+- Rename `tcd-coder.json` as `.tcd-coder.json`.
+
 ## [0.0.1] - 2024-07-31
 
 - Initial release
