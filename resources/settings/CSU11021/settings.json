@@ -3,7 +3,7 @@
         {
             "envKey": "TCD_CODER_PLATFORM_ID",
             "envValue": "CODER",
-            "settings": "docker.json"
+            "settings": "coder.json"
         },
         {
             "envKey": "TCD_CODER_PLATFORM_ID",

@@ -8,6 +8,6 @@
         "openocdPath": "/usr/bin/openocd"
     },
     "globalSettings": {
-        "git.defaultCloneDirectory": "/home/vscode/computing"
+        "git.defaultCloneDirectory": "~/computing"
     }
 }

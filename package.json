@@ -4,7 +4,7 @@
   "description": "Easier management of coding examples and assessment for TCD students",
   "publisher": "jdtcd",
   "repository": "https://github.com/jdtcd/tcd-coder",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "engines": {
     "vscode": "^1.91.0"
   },
